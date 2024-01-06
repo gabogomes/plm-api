@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  plm_api:
+    container_name: plm_api
+    build:
+      context: ./
+    command: >
+        bash -c 'uvicorn plm.main:app --host 0.0.0.0 --reload'
+    volumes:
+      - ./plm:/app/plm
+      - .env:/app/.env
+    ports:
+      - 8000:8000
+    depends_on:
+      - plm_db
+  flyway:
+    container_name: flyway
+    image: flyway/flyway:9
+    command: -configFiles=/flyway/conf/flyway.conf -locations=filesystem:/flyway/sql -connectRetries=60 migrate
+    volumes:
+      - ./flyway/sql:/flyway/sql
+      - ./flyway/local-flyway.conf:/flyway/conf/flyway.conf
+    depends_on:
+      - plm_db
+    profiles:
+      - migration
+  plm_db:
+    container_name: plm_db
+    image: postgres:14-alpine
+    restart: on-failure:3
+    env_file: .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - 5454:5432
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+
+volumes:
+  postgres_data:
