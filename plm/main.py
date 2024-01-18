@@ -10,13 +10,13 @@ load_dotenv()
 
 from fastapi import FastAPI, Depends, Request, status
 from fastapi_pagination import add_pagination
-from fastapi_auth0 import Auth0
 
 from plm.settings import PlmSettings
 from plm.services.db import get_engine
 from plm.dependencies import initialize_dependencies
 from plm.endpoints.v1.health import router as health_router
 from plm.endpoints.v1.migration import router as migration_router
+from plm.endpoints.v1.task import router as task_router
 
 try:
     settings = PlmSettings()
@@ -29,7 +29,7 @@ engine = get_engine(settings)
 initialize_dependencies(settings, engine)
 
 app = FastAPI(
-    title="Plm API",
+    title="Personal Life Manager API",
     docs_url="/docs",
     root_path="/",
 )
@@ -53,5 +53,6 @@ add_pagination(app)
 
 app.include_router(health_router, tags=["Health"])
 app.include_router(migration_router, tags=["Schema Migration"])
+app.include_router(task_router, tags=["Tasks"])
 
 logging.getLogger().setLevel(logging.INFO)
