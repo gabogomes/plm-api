@@ -11,6 +11,5 @@ create table if not exists task
     modified_by text,
     modified_on timestamp,
 
-    constraint task_pkey primary key(id),
-    constraint unique_user_id unique(user_id)
+    constraint task_pkey primary key(id)
 );
