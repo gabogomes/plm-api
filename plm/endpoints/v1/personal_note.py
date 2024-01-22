@@ -69,6 +69,7 @@ def create_personal_note(
 ):
     personal_note_entity = PersonalNote.parse_obj(payload)
     personal_note_entity.task_id = task_id
+    personal_note_entity.user_id = user_id
 
     if not is_personal_note_name_unique(db, personal_note_entity, user_id):
         raise_validation_exception(
