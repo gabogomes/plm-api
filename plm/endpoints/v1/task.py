@@ -5,7 +5,10 @@ from plm.dependencies import get_db
 from sqlmodel import Session, select
 from fastapi_pagination.ext.sqlalchemy import paginate
 from plm.services.db import apply_patch
-from plm.endpoints.helpers.task_helpers import get_task_or_404
+from plm.endpoints.helpers.task_helpers import get_task_or_404, is_task_name_unique
+from plm.services.validation_exceptions import (
+    raise_validation_exception,
+)
 
 router = APIRouter(prefix="/v1")
 
@@ -52,6 +55,9 @@ def create_task(
 ):
     task_entity = Task.parse_obj(payload)
 
+    if not is_task_name_unique(db, task_entity):
+        raise_validation_exception(f"A task with this same name already exists.")
+
     db.add(task_entity)
     db.commit()
 
@@ -71,6 +77,11 @@ def update_task(
     db: Session = Depends(get_db),
 ):
     task_entity = get_task_or_404(db, user_id, task_id)
+
+    if payload.name:
+        task_entity.name = payload.name
+        if not is_task_name_unique(db, task_entity):
+            raise_validation_exception(f"A task with this same name already exists.")
 
     apply_patch(task_entity, payload)
 

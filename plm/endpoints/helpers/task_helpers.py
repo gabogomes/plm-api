@@ -14,3 +14,11 @@ def get_task_or_404(db: Session, user_id: str, task_id: int) -> Task:
         raise HTTPException(404)
 
     return task_entity
+
+
+def is_task_name_unique(db: Session, task_entity: Task) -> bool:
+    task_name = task_entity.name
+
+    existing_task = db.query(Task).filter(Task.name == task_name).first()
+
+    return True if existing_task is None else False
