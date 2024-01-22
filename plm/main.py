@@ -17,6 +17,7 @@ from plm.dependencies import initialize_dependencies
 from plm.endpoints.v1.health import router as health_router
 from plm.endpoints.v1.migration import router as migration_router
 from plm.endpoints.v1.task import router as task_router
+from plm.endpoints.v1.personal_note import router as personal_note_router
 
 try:
     settings = PlmSettings()
@@ -54,5 +55,6 @@ add_pagination(app)
 app.include_router(health_router, tags=["Health"])
 app.include_router(migration_router, tags=["Schema Migration"])
 app.include_router(task_router, tags=["Tasks"])
+app.include_router(personal_note_router, tags=["Personal Notes"])
 
 logging.getLogger().setLevel(logging.INFO)

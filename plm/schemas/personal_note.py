@@ -5,11 +5,11 @@ from datetime import datetime
 from typing import Optional
 
 
-class TaskResponse(CamelModel):
+class PersonalNoteResponse(CamelModel):
     id: int
     name: str
-    status: str
     type: str
+    note: str
     correspondence_email_address: str
     created_by: str
     created_on: datetime
@@ -17,15 +17,15 @@ class TaskResponse(CamelModel):
     modified_on: Optional[datetime]
 
 
-class TaskCreate(CamelModel):
+class PersonalNoteCreate(CamelModel):
     name: str
-    status: str
     type: str
+    note: str
     user_id: Optional[str]
     correspondence_email_address: str
 
 
-class TaskUpdate(CamelModel):
+class PersonalNoteUpdate(CamelModel):
     name: Optional[str]
-    status: Optional[str]
     type: Optional[str]
+    note: Optional[str]

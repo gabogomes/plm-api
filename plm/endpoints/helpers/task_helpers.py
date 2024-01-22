@@ -16,9 +16,11 @@ def get_task_or_404(db: Session, user_id: str, task_id: int) -> Task:
     return task_entity
 
 
-def is_task_name_unique(db: Session, task_entity: Task) -> bool:
+def is_task_name_unique(db: Session, task_entity: Task, user_id: str) -> bool:
     task_name = task_entity.name
 
-    existing_task = db.query(Task).filter(Task.name == task_name).first()
+    existing_task = (
+        db.query(Task).filter(Task.name == task_name, Task.user_id == user_id).first()
+    )
 
     return True if existing_task is None else False

@@ -44,18 +44,20 @@ def get_task(
 
 
 @router.post(
-    path="/tasks",
+    path="/tasks/{userId}",
     name="Create new task",
     response_model=TaskResponse,
     response_model_exclude_none=True,
 )
 def create_task(
     payload: TaskCreate,
+    user_id: str = Path(alias="userId"),
     db: Session = Depends(get_db),
 ):
     task_entity = Task.parse_obj(payload)
+    task_entity.user_id = user_id
 
-    if not is_task_name_unique(db, task_entity):
+    if not is_task_name_unique(db, task_entity, user_id):
         raise_validation_exception(f"A task with this same name already exists.")
 
     db.add(task_entity)
@@ -78,9 +80,9 @@ def update_task(
 ):
     task_entity = get_task_or_404(db, user_id, task_id)
 
-    if payload.name:
+    if payload.name and payload.name != task_entity.name:
         task_entity.name = payload.name
-        if not is_task_name_unique(db, task_entity):
+        if not is_task_name_unique(db, task_entity, user_id):
             raise_validation_exception(f"A task with this same name already exists.")
 
     apply_patch(task_entity, payload)
