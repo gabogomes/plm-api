@@ -1,5 +1,10 @@
 # Starting the Application
 
+Firstly, complete the steps below:
+
+- Create Clerk Application / Contact Gabriel Gomes to get credentials values for using in the Front-End .env.local file
+- Create E-mail Address for Alarms and Notifications / Contact Gabriel Gomes to use external standard e-mail address for sending notifications and alarms 
+
 To start the application, make sure you have Docker and Docker Compose installed, as well as proper Internet connection. The command to start the multi-container application locally is:
 
 `docker compose --profile migration up`
