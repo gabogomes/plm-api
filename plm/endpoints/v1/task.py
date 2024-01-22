@@ -1,5 +1,5 @@
 from fastapi import Depends, APIRouter, Path
-from plm.schemas import Page, TaskResponse, TaskCreate, TaskUpdate, TaskSingleResponse
+from plm.schemas import Page, TaskResponse, TaskCreate, TaskUpdate
 from plm.models import Task
 from plm.dependencies import get_db
 from sqlmodel import Session, select
@@ -26,7 +26,7 @@ def get_tasks(user_id: str = Path(alias="userId"), db: Session = Depends(get_db)
 @router.get(
     path="/tasks/{userId}/{taskId}",
     name="Get a given task by id",
-    response_model=TaskSingleResponse,
+    response_model=TaskResponse,
     response_model_exclude_none=True,
 )
 def get_task(
