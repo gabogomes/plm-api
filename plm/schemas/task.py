@@ -29,3 +29,9 @@ class TaskUpdate(CamelModel):
     name: Optional[str]
     status: Optional[str]
     type: Optional[str]
+
+
+class TaskSingleResponse(CamelModel):
+    name: Optional[str]
+    status: Optional[str]
+    type: Optional[str]
