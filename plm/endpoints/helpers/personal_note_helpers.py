@@ -1,6 +1,11 @@
 from sqlmodel import Session, and_
 from plm.models import PersonalNote
 from fastapi import HTTPException
+from plm.enums import PersonalNoteTypes
+from typing import List
+from plm.services.validation_exceptions import (
+    raise_validation_exception,
+)
 
 
 def get_personal_note_or_404(
@@ -38,3 +43,12 @@ def is_personal_note_name_unique(
     )
 
     return True if existing_personal_note is None else False
+
+
+def check_personal_note_types(
+    personal_note_entity: PersonalNote, allowed_types: List[PersonalNoteTypes]
+) -> None:
+    if personal_note_entity.type not in allowed_types:
+        raise_validation_exception(
+            f"The note has a type of {personal_note_entity.type}, which is not allowed."
+        )

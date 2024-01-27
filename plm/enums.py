@@ -13,3 +13,23 @@ class _StringEnum(str, Enum):
 class Permission(_StringEnum):
     Read = "read:all"
     Admin = "admin:all"
+
+
+class TaskStatus(_StringEnum):
+    ToDo = "To Do"
+    InProgress = "In Progress"
+    PendingForRevision = "Pending for Revision"
+    Done = "Done"
+
+
+class TaskTypes(_StringEnum):
+    Work = "Work"
+    Studies = "Studies"
+    WellBeing = "Well Being"
+    Others = "Others"
+
+
+class PersonalNoteTypes(_StringEnum):
+    Description = "Description"
+    ProgressReport = "Progress Report"
+    Observations = "Observations"

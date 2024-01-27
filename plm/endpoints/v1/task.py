@@ -5,10 +5,16 @@ from plm.dependencies import get_db
 from sqlmodel import Session, select
 from fastapi_pagination.ext.sqlalchemy import paginate
 from plm.services.db import apply_patch
-from plm.endpoints.helpers.task_helpers import get_task_or_404, is_task_name_unique
+from plm.endpoints.helpers.task_helpers import (
+    get_task_or_404,
+    is_task_name_unique,
+    check_task_status,
+    check_task_types,
+)
 from plm.services.validation_exceptions import (
     raise_validation_exception,
 )
+from plm.enums import TaskStatus, TaskTypes
 
 router = APIRouter(prefix="/v1")
 
@@ -60,6 +66,21 @@ def create_task(
     if not is_task_name_unique(db, task_entity, user_id):
         raise_validation_exception(f"A task with this same name already exists.")
 
+    check_task_status(
+        task_entity,
+        [
+            TaskStatus.ToDo,
+            TaskStatus.InProgress,
+            TaskStatus.PendingForRevision,
+            TaskStatus.Done,
+        ],
+    )
+
+    check_task_types(
+        task_entity,
+        [TaskTypes.Work, TaskTypes.Studies, TaskTypes.WellBeing, TaskTypes.Others],
+    )
+
     db.add(task_entity)
     db.commit()
 
@@ -86,6 +107,21 @@ def update_task(
             raise_validation_exception(f"A task with this same name already exists.")
 
     apply_patch(task_entity, payload)
+
+    check_task_status(
+        task_entity,
+        [
+            TaskStatus.ToDo,
+            TaskStatus.InProgress,
+            TaskStatus.PendingForRevision,
+            TaskStatus.Done,
+        ],
+    )
+
+    check_task_types(
+        task_entity,
+        [TaskTypes.Work, TaskTypes.Studies, TaskTypes.WellBeing, TaskTypes.Others],
+    )
 
     db.commit()
 

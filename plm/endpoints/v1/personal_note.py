@@ -7,11 +7,13 @@ from plm.services.db import apply_patch
 from plm.endpoints.helpers.personal_note_helpers import (
     get_personal_note_or_404,
     is_personal_note_name_unique,
+    check_personal_note_types,
 )
 from plm.services.validation_exceptions import (
     raise_validation_exception,
 )
 from typing import List
+from plm.enums import PersonalNoteTypes
 
 router = APIRouter(prefix="/v1")
 
@@ -76,47 +78,75 @@ def create_personal_note(
             f"A personal note with this same name already exists."
         )
 
+    check_personal_note_types(
+        personal_note_entity,
+        [
+            PersonalNoteTypes.Description,
+            PersonalNoteTypes.ProgressReport,
+            PersonalNoteTypes.Observations,
+        ],
+    )
+
     db.add(personal_note_entity)
     db.commit()
 
     return personal_note_entity
 
 
-"""
 @router.patch(
-    path="/tasks/{userId}/{taskId}",
-    name="Update an existing task",
-    response_model=TaskResponse,
+    path="/tasks/{userId}/{taskId}/personal-notes/{personalNoteId}",
+    name="Update an existing note",
+    response_model=PersonalNoteResponse,
     response_model_exclude_none=True,
 )
-def update_task(
-    payload: TaskUpdate,
+def update_personal_note(
+    payload: PersonalNoteUpdate,
     user_id: str = Path(alias="userId"),
     task_id: int = Path(alias="taskId"),
+    personal_note_id: int = Path(alias="personalNoteId"),
     db: Session = Depends(get_db),
 ):
-    task_entity = get_task_or_404(db, user_id, task_id)
+    personal_note_entity = get_personal_note_or_404(
+        db, user_id, task_id, personal_note_id
+    )
 
     if payload.name:
-        task_entity.name = payload.name
-        if not is_task_name_unique(db, task_entity):
-            raise_validation_exception(f"A task with this same name already exists.")
+        personal_note_entity.name = payload.name
+        if not is_personal_note_name_unique(db, personal_note_entity, user_id):
+            raise_validation_exception(
+                f"A personal note with this same name already exists."
+            )
 
-    apply_patch(task_entity, payload)
+    apply_patch(personal_note_entity, payload)
+
+    check_personal_note_types(
+        personal_note_entity,
+        [
+            PersonalNoteTypes.Description,
+            PersonalNoteTypes.ProgressReport,
+            PersonalNoteTypes.Observations,
+        ],
+    )
 
     db.commit()
 
-    return task_entity
+    return personal_note_entity
 
 
-@router.delete(path="/tasks/{userId}/{taskId}", name="Delete a task", status_code=204)
-def delete_task(
+@router.delete(
+    path="/tasks/{userId}/{taskId}/personal-notes/{personalNoteId}",
+    name="Delete a personal note",
+    status_code=204,
+)
+def delete_personal_note(
     user_id: str = Path(alias="userId"),
     task_id: int = Path(alias="taskId"),
+    personal_note_id: int = Path(alias="personalNoteId"),
     db: Session = Depends(get_db),
 ) -> None:
-    task_entity = get_task_or_404(db, user_id, task_id)
+    personal_note_entity = get_personal_note_or_404(
+        db, user_id, task_id, personal_note_id
+    )
 
-    db.delete(task_entity)
+    db.delete(personal_note_entity)
     db.commit()
-"""
