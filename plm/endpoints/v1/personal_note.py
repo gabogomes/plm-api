@@ -58,7 +58,7 @@ def get_personal_note(
 
 
 @router.post(
-    path="/tasks/{userId}/{taskId}/personal-notes/",
+    path="/tasks/{userId}/{taskId}/personal-notes",
     name="Create new personal note for a given task",
     response_model=PersonalNoteResponse,
     response_model_exclude_none=True,

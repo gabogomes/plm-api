@@ -1,5 +1,5 @@
 from sqlmodel import Session, and_
-from plm.models import Task
+from plm.models import Task, PersonalNote
 from fastapi import HTTPException
 from plm.enums import TaskStatus, TaskTypes
 from typing import List
@@ -43,3 +43,14 @@ def check_task_types(task_entity: Task, allowed_types: List[TaskTypes]) -> None:
         raise_validation_exception(
             f"The task has a type of {task_entity.type}, which is not allowed."
         )
+
+
+def task_has_existing_personal_notes(db: Session, task_entity: Task) -> None:
+    existing_personal_note = (
+        db.query(PersonalNote).filter(PersonalNote.task_id == task_entity.id).first()
+    )
+
+    if not existing_personal_note:
+        return False
+
+    return True

@@ -10,6 +10,7 @@ from plm.endpoints.helpers.task_helpers import (
     is_task_name_unique,
     check_task_status,
     check_task_types,
+    task_has_existing_personal_notes,
 )
 from plm.services.validation_exceptions import (
     raise_validation_exception,
@@ -135,6 +136,11 @@ def delete_task(
     db: Session = Depends(get_db),
 ) -> None:
     task_entity = get_task_or_404(db, user_id, task_id)
+
+    if task_has_existing_personal_notes(db, task_entity):
+        raise_validation_exception(
+            "Cannot delete a task for which there are existing personal notes."
+        )
 
     db.delete(task_entity)
     db.commit()
