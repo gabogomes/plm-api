@@ -4,7 +4,7 @@ uvicorn==0.20.0
 mangum==0.17.0
 #psycopg2==2.9.5
 # If psycopg2 does not work for your local environment, just uncomment line below and comment line above
-psycopg2-binary
+psycopg2-binary==2.9.9
 sqlalchemy==1.4.41
 sqlmodel==0.0.8
 fastapi-auth0==0.3.2
