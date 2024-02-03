@@ -1,4 +1,5 @@
 import logging
+import smtplib
 
 from fastapi import Depends, HTTPException
 from fastapi_auth0 import Auth0User
@@ -8,6 +9,7 @@ from sqlalchemy.future import Engine
 from plm.security import User
 from plm.enums import Permission
 from plm.services.db import SessionWithUser
+from plm.services.email_service import EmailSenderClient
 from plm.settings import PlmSettings
 
 _dependencies = {}
@@ -28,6 +30,21 @@ def reset_dependencies():
 
 def get_settings():
     return _dependencies["settings"]
+
+
+def get_email_client(
+    settings: PlmSettings = Depends(get_settings),
+) -> EmailSenderClient:
+    smtp_server = settings.smtp_server
+    smtp_port = settings.smtp_port
+    smtp_username = settings.plm_email_address
+    smtp_password = settings.plm_email_password
+
+    with EmailSenderClient(smtp_server, smtp_port) as smtp:
+        smtp.starttls()
+        smtp.login(smtp_username, smtp_password)
+        smtp.set_sender_email_address(smtp_username)
+        yield smtp
 
 
 async def get_auth0_user(settings: PlmSettings = Depends(get_settings)) -> Auth0User:

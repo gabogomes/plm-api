@@ -18,6 +18,7 @@ from plm.endpoints.v1.health import router as health_router
 from plm.endpoints.v1.migration import router as migration_router
 from plm.endpoints.v1.task import router as task_router
 from plm.endpoints.v1.personal_note import router as personal_note_router
+from plm.endpoints.v1.email_service import router as emails_router
 
 try:
     settings = PlmSettings()
@@ -56,5 +57,6 @@ app.include_router(health_router, tags=["Health"])
 app.include_router(migration_router, tags=["Schema Migration"])
 app.include_router(task_router, tags=["Tasks"])
 app.include_router(personal_note_router, tags=["Personal Notes"])
+app.include_router(emails_router, tags=["Emails"])
 
 logging.getLogger().setLevel(logging.INFO)
