@@ -2,8 +2,8 @@ from fastapi import Depends, APIRouter, Path
 from plm.models import PersonalNote
 from plm.dependencies import get_db, get_email_client
 from sqlmodel import Session, select
-import smtplib
 from plm.services.email_service import EmailSenderClient
+from plm.endpoints.helpers.task_helpers import get_task_or_404
 
 router = APIRouter(prefix="/v1")
 
@@ -19,14 +19,26 @@ def send_email_notification(
     email_client: EmailSenderClient = Depends(get_email_client),
 ):
 
-    subject = "Test Subject"
+    task = get_task_or_404(db, user_id, task_id)
 
-    body = "Test Body"
+    personal_notes = db.exec(
+        select(PersonalNote).where(PersonalNote.task_id == task_id)
+    ).all()
+
+    subject = f"PLM Reminder: {task.name}"
+
+    body = "Personal Notes:\n"
+    for note in personal_notes:
+        body += f"\nPersonal Note Name: {note.name}\n"
+        body += f"Personal Note Type: {note.type}\n"
+        body += f"Personal Note Description: {note.note}\n"
+
+    message_body = f"Subject: {subject}\n\n{body}"
 
     email_client.sendmail(
-        email_client.sender_email_address,
-        "aulasconsultorias@gmail.com",
-        f"Subject: {subject}\n\n{body}",
+        from_addr=email_client.sender_email_address,
+        to_addrs=task.correspondence_email_address,
+        msg=message_body,
     )
 
-    return True
+    return {"message": f"Email sent successfully for Task named {task.name}"}
