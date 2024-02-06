@@ -43,27 +43,3 @@ def raise_validation_exception(
             for message in messages
         ],
     )
-
-
-class ValidationExceptionCollector:
-    def __init__(self):
-        self.errors: List[_MessageWithProperties] = []
-
-    def add_error(self, message: str, properties: Union[str, List[str]] = None):
-        """
-        Add an error to the collection.
-        """
-        self.errors.append(_MessageWithProperties(message, properties))
-
-    def errors_exist(self) -> bool:
-        """
-        Returns True if at least one error has been added.
-        """
-        return len(self.errors) > 0
-
-    def raise_if_needed(self):
-        """
-        Raise a 400 exception if any errors were found.
-        """
-        if len(self.errors) > 0:
-            raise HTTPException(400, [_format_error(error) for error in self.errors])
