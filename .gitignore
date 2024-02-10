@@ -1,3 +1,13 @@
+# Env and local-only files
 venv/
 DIARY.md
 .env
+
+# Compiled Python bytecode
+*.py[cod]
+__pycache__
+
+# Unit testing and code coverage
+.coverage
+htmlcov
+.pytest_cache
