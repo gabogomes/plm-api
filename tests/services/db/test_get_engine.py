@@ -192,3 +192,47 @@ def test_set_created_and_modified_attributes_without_email(
 
     with pytest.raises(AttributeError):
         assert dirty_non_entity.modified_on == None
+
+
+@patch("plm.services.db.engine.create_engine")
+@patch("plm.services.db.engine.event")
+def test_get_engine_with_password(mock_event, mock_create_engine):
+    mock_rds_client = MagicMock()
+    mock_generate_token = MagicMock()
+    mock_rds_client.generate_db_auth_token = mock_generate_token
+    engine = "engine"
+    mock_create_engine.return_value = engine
+    settings = get_settings(
+        db_username="db_username",
+        db_name="db_name",
+        local_db_host="local_db_host",
+        local_db_port=544,
+        db_password="db_password",
+        smtp_server="smtp_server",
+        smtp_port=211,
+        plm_email_address="plm_email_address",
+        plm_email_password="plm_email_password",
+    )
+
+    created_engine = get_engine(settings)
+
+    assert created_engine == engine
+    url = get_url("local_db_host", 544, "db_name", "db_username")
+    mock_create_engine.assert_called_once_with(
+        url=url, connect_args={"sslmode": "allow"}
+    )
+
+    assert mock_event.listens_for.call_count == 2
+    assert mock_event.listens_for.call_args_list[0][0][0] == engine
+    assert mock_event.listens_for.call_args_list[0][0][1] == "do_connect"
+    assert mock_event.listens_for.call_args_list[1][0][0] == SessionWithUser
+    assert mock_event.listens_for.call_args_list[1][0][1] == "before_flush"
+    provide_token = mock_event.listens_for().mock_calls[0][1][0]
+
+    mock_generate_token.assert_not_called()
+
+    # Test to make sure we use the configured password.
+    cparams = {}
+    provide_token("", "", "", cparams)
+    assert cparams["password"] == "db_password"
+    mock_generate_token.assert_not_called()
