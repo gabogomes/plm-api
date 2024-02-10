@@ -33,3 +33,19 @@ Sometimes, you may have problems shutting down the database and API containers. 
 `kill -s SIGINT 1`
 
 To remove all the containers you have (running or stopped), the corresponding images of the stack and the volume associated to the database, execute the `clean_stack.sh` script.
+
+# Unit Tests and Coverage
+
+Unit and integration tests are used in this repository, to help automate tests in cases where the core files of the repository (like models, endpoints and schemas) change. To run unit tests for all files, use (at the root level of the repository)
+
+`python -m coverage run --source=plm --omit=plm/main.py -m pytest`
+
+To verify the level of coverage of the test files, use
+
+`python -m coverage report -m`
+
+To ensure that code standards and formatting are always respected, please use
+
+`python -m black .`
+
+At the root folder of the repository, before any commit. That will keep the standard number of characters per Python code line, and also keep the spacing between classes and functions inside files (two lines between functions or classes).
