@@ -37,7 +37,9 @@ def is_personal_note_name_unique(
     existing_personal_note = (
         db.query(PersonalNote)
         .filter(
-            PersonalNote.name == personal_note_name, PersonalNote.user_id == user_id
+            and_(
+                PersonalNote.name == personal_note_name, PersonalNote.user_id == user_id
+            )
         )
         .first()
     )

@@ -25,7 +25,9 @@ def is_task_name_unique(db: Session, task_entity: Task, user_id: str) -> bool:
     task_name = task_entity.name
 
     existing_task = (
-        db.query(Task).filter(Task.name == task_name, Task.user_id == user_id).first()
+        db.query(Task)
+        .filter(and_(Task.name == task_name, Task.user_id == user_id))
+        .first()
     )
 
     return True if existing_task is None else False

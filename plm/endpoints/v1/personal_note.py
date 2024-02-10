@@ -2,7 +2,7 @@ from fastapi import Depends, APIRouter, Path
 from plm.schemas import PersonalNoteResponse, PersonalNoteCreate, PersonalNoteUpdate
 from plm.models import PersonalNote
 from plm.dependencies import get_db
-from sqlmodel import Session, select
+from sqlmodel import Session, select, and_
 from plm.services.db import apply_patch
 from plm.endpoints.helpers.personal_note_helpers import (
     get_personal_note_or_404,
@@ -32,7 +32,7 @@ def get_personal_notes(
 
     query = db.exec(
         select(PersonalNote).filter(
-            PersonalNote.user_id == user_id, PersonalNote.task_id == task_id
+            and_(PersonalNote.user_id == user_id, PersonalNote.task_id == task_id)
         )
     ).all()
 
